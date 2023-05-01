@@ -23,58 +23,67 @@ class MyApp extends StatelessWidget {
   }
 }
 
+
+
 class MyWidget extends StatefulWidget {
   @override
   _MyWidgetState createState() => _MyWidgetState();
 }
 
 class _MyWidgetState extends State<MyWidget> {
-  bool _isExpanded = false;
+  bool _isFadedIn = false;
 
-  void _toggleExpanded() {
+  void _toggleFadeIn() {
     setState(() {
-      _isExpanded = !_isExpanded;
+      _isFadedIn = !_isFadedIn;
     });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.purple[100],
+      backgroundColor: Colors.grey[200],
       appBar: AppBar(
-        backgroundColor: Colors.purple[800],
+        backgroundColor:   Colors.purple[400],
         title: Text(
-          'Toggle Container Animation',
+          'Fade-in Animation',
           style: TextStyle(fontSize: 15),
         ),
       ),
-      body: Column(
-        children: [
-          GestureDetector(
-            onTap: _toggleExpanded,
-            child: AnimatedContainer(
-              duration: Duration(milliseconds: 500),
-              curve: Curves.easeInOut,
-              height: _isExpanded ? 600 : 200,
-              decoration: BoxDecoration(
-                color: Colors.pink[400],
-
+      body: GestureDetector(
+        onTap: _toggleFadeIn,
+        child: Center(
+          child: Container(
+            width: 200,
+            height: 200,
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [
+                  Colors.purple[400]!,
+                  Colors.pink[400]!,
+                  Colors.orange[400]!,
+                ],
               ),
+              borderRadius: BorderRadius.circular(100),
+            ),
+            child: AnimatedOpacity(
+              duration: Duration(milliseconds: 500),
+              opacity: _isFadedIn ? 1 : 0,
               child: Center(
                 child: Text(
-                  _isExpanded ? 'Tap me to collapse' : 'Tap me to expand',
+                  'Tap me to fade in',
                   style: TextStyle(
                     color: Colors.white,
-                    fontSize: 15,
+                    fontSize: 20,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
               ),
             ),
           ),
-
-
-        ],
+        ),
       ),
     );
   }
