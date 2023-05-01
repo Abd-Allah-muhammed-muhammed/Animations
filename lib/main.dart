@@ -16,138 +16,93 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'AnimatedContainer Example',
+      title: 'AnimatedGradientBox',
       theme: ThemeData.light(),
       darkTheme: ThemeData.dark(),
 
-      home: MyWidget(),
+      home: AnimatedGradientBox(
+        width: 200,
+        height: 200,
+        colors: [Color(0xFFFA8072), Color(0xFF00CED1), Color(0xFFF08080)],
+
+        isRepeating: true,
+      ),
     );
   }
 }
 
 
-class MyWidget extends StatefulWidget {
+class AnimatedGradientBox extends StatefulWidget {
+  final double width;
+  final double height;
+  final List<Color> colors;
+  final bool isRepeating;
+  final int duration;
+
+  const AnimatedGradientBox({
+    Key? key,
+    required this.width,
+    required this.height,
+    required this.colors,
+    this.isRepeating = false,
+    this.duration = 2000,
+  }) : super(key: key);
+
   @override
-  _MyWidgetState createState() => _MyWidgetState();
+  _AnimatedGradientBoxState createState() => _AnimatedGradientBoxState();
 }
 
-class _MyWidgetState extends State<MyWidget>
+class _AnimatedGradientBoxState extends State<AnimatedGradientBox>
     with SingleTickerProviderStateMixin {
-  late AnimationController _animationController;
+  late AnimationController _controller;
   late Animation<double> _animation;
 
   @override
   void initState() {
     super.initState();
-    _animationController =
-        AnimationController(vsync: this, duration: Duration(seconds: 1));
-    _animation =
-        Tween<double>(begin: 0, end: 2 * pi).animate(_animationController);
-  }
 
-  @override
-  void dispose() {
-    _animationController.dispose();
-    super.dispose();
-  }
+    _controller = AnimationController(
+      vsync: this,
+      duration: Duration(milliseconds: widget.duration),
+    );
 
-  void _startAnimation() {
-    if (_animationController.isCompleted) {
-      _animationController.reverse();
+    _animation = Tween<double>(
+      begin: 0,
+      end: 1,
+    ).animate(_controller);
+
+    if (widget.isRepeating) {
+      _controller.repeat();
     } else {
-      _animationController.forward();
+      _controller.forward();
     }
   }
 
   @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.grey[200],
-      appBar: AppBar(
-        backgroundColor: Color(0xFFC277B8),
-        title: Text(
-          'Rotating Clock',
-          style: TextStyle(fontSize: 15),
-        ),
-      ),
-      body: Center(
-        child: GestureDetector(
-          onTap: _startAnimation,
-          child: Container(
-            width: 200,
-            height: 200,
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [
-                  Color(0xFF5D5FEF),
-                  Color(0xFFDF5D5F),
-                ],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
-              borderRadius: BorderRadius.circular(100),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.2),
-                  blurRadius: 10,
-                  spreadRadius: 2,
-                ),
-              ],
-            ),
-            child: RotationTransition(
-              turns: _animation,
-              child: Stack(
-                children: [
-                  Positioned.fill(
-                    child: Container(
-                      color: Colors.transparent,
-                      child: Center(
-                        child: Container(
-                          width: 6,
-                          height: 80,
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(4),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withOpacity(0.2),
-                                blurRadius: 5,
-                                spreadRadius: 1,
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                  Positioned.fill(
-                    child: Container(
-                      color: Colors.transparent,
-                      child: Center(
-                        child: Container(
-                          width: 12,
-                          height: 12,
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            shape: BoxShape.circle,
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withOpacity(0.2),
-                                blurRadius: 5,
-                                spreadRadius: 1,
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
+    return AnimatedBuilder(
+      animation: _animation,
+      builder: (context, child) {
+        return Container(
+          width: widget.width,
+          height: widget.height,
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: widget.colors,
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              stops: [0.0, _animation.value, 1.0],
+              tileMode: TileMode.clamp,
             ),
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 }
