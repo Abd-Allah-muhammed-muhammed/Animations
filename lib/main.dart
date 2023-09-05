@@ -1,80 +1,126 @@
+import 'dart:math';
 import 'package:flutter/material.dart';
 
-
-
 void main() {
-  runApp(
-    MyApp(),
-
-  );
+  runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'AnimatedContainer Example',
-      theme: ThemeData.light(),
-      darkTheme: ThemeData.dark(),
-
-      home: MyWidget(),
+      home: Scaffold(
+        appBar: AppBar(
+          title: Text('Islamic Rosary Beads'),
+        ),
+        body: RosaryBeads(),
+      ),
     );
   }
 }
 
-class MyWidget extends StatefulWidget {
+class RosaryBeads extends StatefulWidget {
   @override
-  _MyWidgetState createState() => _MyWidgetState();
+  _RosaryBeadsState createState() => _RosaryBeadsState();
 }
 
-class _MyWidgetState extends State<MyWidget> {
-  bool _isExpanded = false;
+class _RosaryBeadsState extends State<RosaryBeads> with TickerProviderStateMixin {
+  int clickedIndex = 0;
 
-  void _toggleExpanded() {
+
+  void _handleBeadTap(int index) {
+
+    print(clickedIndex);
+    if (clickedIndex ==33) {
+
+      clickedIndex = 0;
+    }else{
+      clickedIndex++;
+    }
     setState(() {
-      _isExpanded = !_isExpanded;
+
+
     });
+  }
+
+  double getBeadSize(int index) {
+
+    if (index == 0) {
+
+      return 80.0;
+
+    }  else {
+
+      return index == clickedIndex ? 60.0 : 40.0; // Adjust bead size as needed
+
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.purple[100],
-      appBar: AppBar(
-        backgroundColor: Colors.purple[800],
-        title: Text(
-          'Toggle Container Animation',
-          style: TextStyle(fontSize: 15),
-        ),
-      ),
-      body: Column(
-        children: [
-          GestureDetector(
-            onTap: _toggleExpanded,
-            child: AnimatedContainer(
-              duration: Duration(milliseconds: 500),
-              curve: Curves.easeInOut,
-              height: _isExpanded ? 600 : 200,
-              decoration: BoxDecoration(
-                color: Colors.pink[400],
+    return Center(
+      child: AnimatedContainer(
 
-              ),
-              child: Center(
-                child: Text(
-                  _isExpanded ? 'Tap me to collapse' : 'Tap me to expand',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 15,
-                    fontWeight: FontWeight.bold,
+        duration: Duration(milliseconds: 400),
+        child: Stack(
+          children: List.generate(34, (index) {
+            final double angle = 2 * pi / 36 * index;
+            final double centerX = 250.0; // Adjust the center X coordinate
+            final double centerY = 250.0; // Adjust the center Y coordinate
+            final double radius = 150.0; // Adjust the radius
+
+            final double x = centerX + radius * cos(angle);
+            final double y = centerY + radius * sin(angle);
+
+            if (index==0) {
+
+              return Positioned(
+                left: x - 30, // 30 is half of the bead size
+                top: y - 60, // 30 is half of the bead size
+                child: GestureDetector(
+                  onTap: () => _handleBeadTap(index),
+                  child: AnimatedContainer(
+                    duration: Duration(milliseconds: 300),
+                    width: getBeadSize(index),
+                    height: getBeadSize(index),
+                    decoration: BoxDecoration(
+                      color: Colors.blue,
+                      shape: BoxShape.circle,
+
+                    ),
                   ),
                 ),
-              ),
-            ),
-          ),
-
-
-        ],
+              );
+            }  else {
+              return Positioned(
+                left: x - 10, // 30 is half of the bead size
+                top: y - 30, // 30 is half of the bead size
+                child: GestureDetector(
+                  onTap: () => _handleBeadTap(index),
+                  child: AnimatedContainer(
+                  transformAlignment: Alignment.bottomCenter,
+                    duration: Duration(milliseconds: 400,),
+                    width: getBeadSize(index),
+                    height: getBeadSize(index),
+                    decoration: BoxDecoration(
+                      color: index == clickedIndex ? Colors.blue : Colors.green,
+                      shape: BoxShape.circle,
+                    ),
+                    child: Center(
+                      child: Text(
+                        (index).toString(),
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              );
+            }}),
+        ),
       ),
     );
   }
